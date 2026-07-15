@@ -210,23 +210,18 @@ console.log(JSON.stringify(token?.access_token));
 
 
 
-    if(frontdoor.frontdoorUrl){
+if(frontdoor.frontdoor_uri){
 
+    document
+      .getElementById("loApp")
+      .frontdoorUrl = frontdoor.frontdoor_uri;
 
-        document
-        .getElementById("loApp")
-        .frontdoorUrl =
-            frontdoor.frontdoorUrl;
+}
+else {
 
+    alert(JSON.stringify(frontdoor));
 
-    }
-    else {
-
-        alert(
-            JSON.stringify(frontdoor)
-        );
-
-    }
+}
 console.log("Frontdoor response", frontdoor);
 
 

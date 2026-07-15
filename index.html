@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>External site title</title>
+
     <script src="https://masternaut--rlmqa.sandbox.my.salesforce.com/lightning/lightning.out.latest/index.iife.prod.js"></script>
 </head>
 
@@ -9,7 +10,9 @@
 
 <h1>External site element 1</h1>
 
-<button id="loginButton">Login with Salesforce</button>
+<button id="loginButton">
+    Login with Salesforce
+</button>
 
 <lightning-out-application
     id="loApp"
@@ -17,19 +20,36 @@
     components="c-test-lightning-out-job-briefing-l-w-c">
 </lightning-out-application>
 
-<c-test-lightning-out-job-briefing-l-w-c></c-test-lightning-out-job-briefing-l-w-c>
+<c-test-lightning-out-job-briefing-l-w-c>
+</c-test-lightning-out-job-briefing-l-w-c>
+
 
 <script>
 
-const SF_DOMAIN = "https://masternaut--rlmqa.sandbox.my.salesforce.com";
-const CLIENT_ID = "3MVG97IVyarqycDlFA_FFTPnM8sbiBiMbTz7Ag_tStB2eUH_P1obbPnnMHkMz2_R7Y12XnVFday6Xh8EKGfTC";
-const APP_ID = "1Usbh00000000knCAA";
-const REDIRECT_URI = window.location.origin + window.location.pathname;
+const SF_DOMAIN =
+    "https://masternaut--rlmqa.sandbox.my.salesforce.com";
+
+const CLIENT_ID =
+    "3MVG97IVyarqycDlFA_FFTPnM8sbiBiMbTz7Ag_tStB2eUH_P1obbPnnMHkMz2_R7Y12XnVFday6Xh8EKGfTC";
+
+const WORKER_URL =
+    "https://wispy-rice-b3c2.basitali89.workers.dev/";
+
+const REDIRECT_URI =
+    window.location.origin + window.location.pathname;
+
 
 function generateVerifier() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    const chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     let result = "";
-    const random = crypto.getRandomValues(new Uint8Array(64));
+
+    const random =
+        crypto.getRandomValues(
+            new Uint8Array(64)
+        );
 
     random.forEach(x => {
         result += chars[x % chars.length];
@@ -38,71 +58,145 @@ function generateVerifier() {
     return result;
 }
 
-async function generateChallenge(verifier) {
-    const data = new TextEncoder().encode(verifier);
-    const hash = await crypto.subtle.digest("SHA-256", data);
 
-    return btoa(String.fromCharCode(...new Uint8Array(hash)))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=/g, "");
+async function generateChallenge(verifier) {
+
+    const data =
+        new TextEncoder().encode(verifier);
+
+    const hash =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+    return btoa(
+        String.fromCharCode(
+            ...new Uint8Array(hash)
+        )
+    )
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 }
 
-document.getElementById("loginButton").onclick = async () => {
 
-    const verifier = generateVerifier();
+document
+.getElementById("loginButton")
+.onclick = async function () {
 
-    sessionStorage.setItem("pkce_verifier", verifier);
+    const verifier =
+        generateVerifier();
 
-    const challenge = await generateChallenge(verifier);
+    sessionStorage.setItem(
+        "pkce_verifier",
+        verifier
+    );
 
-    const url = SF_DOMAIN + "/services/oauth2/authorize?" +
+    const challenge =
+        await generateChallenge(verifier);
+
+
+    const loginUrl =
+        SF_DOMAIN +
+        "/services/oauth2/authorize?" +
         new URLSearchParams({
+
             response_type: "code",
+
             client_id: CLIENT_ID,
+
             redirect_uri: REDIRECT_URI,
+
             code_challenge: challenge,
+
             code_challenge_method: "S256"
+
         });
 
-    window.location.href = url;
+
+    window.location.href = loginUrl;
 };
 
 
-(async function() {
 
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
+(async function () {
 
-    if (!code) return;
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
-    const verifier = sessionStorage.getItem("pkce_verifier");
+    const code =
+        params.get("code");
 
-    const tokenResponse = await fetch(
-        SF_DOMAIN + "/services/oauth2/token",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({
-                grant_type: "authorization_code",
-                client_id: CLIENT_ID,
-                code: code,
-                redirect_uri: REDIRECT_URI,
-                code_verifier: verifier
-            })
-        }
-    );
 
-    const token = await tokenResponse.json();
-
-    console.log("Token response", token);
-
-    if (!token.access_token) {
-        alert(JSON.stringify(token));
+    if (!code) {
         return;
     }
+
+
+    const verifier =
+        sessionStorage.getItem(
+            "pkce_verifier"
+        );
+
+
+    const tokenResponse =
+        await fetch(
+            SF_DOMAIN +
+            "/services/oauth2/token",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+
+                body:
+                    new URLSearchParams({
+
+                        grant_type:
+                            "authorization_code",
+
+                        client_id:
+                            CLIENT_ID,
+
+                        code:
+                            code,
+
+                        redirect_uri:
+                            REDIRECT_URI,
+
+                        code_verifier:
+                            verifier
+
+                    })
+            }
+        );
+
+
+    const token =
+        await tokenResponse.json();
+
+
+    console.log(
+        "Token response",
+        token
+    );
+
+
+    if (!token.access_token) {
+
+        alert(
+            JSON.stringify(token)
+        );
+
+        return;
+    }
+
 
     window.history.replaceState(
         {},
@@ -111,35 +205,55 @@ document.getElementById("loginButton").onclick = async () => {
     );
 
 
-    const fdResponse = await fetch(
-        SF_DOMAIN + "/services/oauth2/lightningoutsingleaccess",
-        {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token.access_token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                appId: APP_ID
-            })
-        }
+    const fdResponse =
+        await fetch(
+            WORKER_URL,
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify({
+
+                        access_token:
+                            token.access_token
+
+                    })
+            }
+        );
+
+
+    const frontdoor =
+        await fdResponse.json();
+
+
+    console.log(
+        "Frontdoor response",
+        frontdoor
     );
 
 
-    const frontdoor = await fdResponse.json();
-
-    console.log("Frontdoor response", frontdoor);
-
     if (frontdoor.frontdoor_uri) {
 
-        document.getElementById("loApp").frontdoorUrl =
+        document
+        .getElementById("loApp")
+        .frontdoorUrl =
             frontdoor.frontdoor_uri;
 
-    } else {
+    }
+    else {
 
-        alert(JSON.stringify(frontdoor));
+        alert(
+            JSON.stringify(frontdoor)
+        );
 
     }
+
 
 })();
 

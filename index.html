@@ -23,7 +23,17 @@
     
     <c-test-lightning-out-job-briefing-l-w-c> </c-test-lightning-out-job-briefing-l-w-c>    
     <h3>External site element 2</h3>
-
+    
+    <script>
+    //Script for adding height to LWC after Lightning out loaded. To avoid taking space till its loaded
+        document.getElementById("loApp").addEventListener("lo.loaded", function () {const component =
+                                                                                    document.querySelector(
+                                                                                        "c-test-lightning-out-job-briefing-l-w-c"
+                                                                                    );                                                                            
+                                                                                    if (component) {
+                                                                                        component.classList.add("loaded");
+                                                                                    }                                                                            
+                                                                                });
     <script>
     // Salesforce configuration
     

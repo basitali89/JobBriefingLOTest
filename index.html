@@ -24,17 +24,6 @@
     <c-test-lightning-out-job-briefing-l-w-c> </c-test-lightning-out-job-briefing-l-w-c>    
     <h3>External site element 2</h3>
     
-    <script>
-    //Script for adding height to LWC after Lightning out loaded. To avoid taking space till its loaded
-        document.getElementById("loApp").addEventListener("lo.loaded", function () {const component =
-                                                                                    document.querySelector(
-                                                                                        "c-test-lightning-out-job-briefing-l-w-c"
-                                                                                    );                                                                            
-                                                                                    if (component) {
-                                                                                        component.classList.add("loaded");
-                                                                                    }                                                                            
-                                                                                });
-    </script>
     
     <script>
     //Main script
@@ -52,6 +41,15 @@
     
     const REDIRECT_URI =
         window.location.origin + window.location.pathname;
+    // To expand height on load
+    function expandLightningComponent(){
+
+        const component = document.querySelector( "c-test-lightning-out-job-briefing-l-w-c" );       
+        if(component){    
+            component.classList.add("loaded");    
+            console.log("Lightning component expanded");    
+        }
+    }    
     
     // Create a random PKCE code verifier
     
@@ -185,11 +183,9 @@
         // Pass the frontdoor URL to Lightning Out
     
         if (frontdoor.frontdoor_uri) {
-            document
-            .getElementById("loApp")
-            .frontdoorUrl =
-                frontdoor.frontdoor_uri;
-    
+            document.getElementById("loApp").frontdoorUrl = frontdoor.frontdoor_uri;
+            // Expand component height after Salesforce session is ready
+            expandLightningComponent();
         }
         else {
             alert(
